@@ -7,10 +7,7 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --noir: #0e0e0e; --blanc: #f5f3ee; --or: #c9a84c; --or-light: #e8d5a3;
-    --gris: #6b6b6b; --gris-light: #e8e6e1; --border: #ddd9d0; --surface: #faf8f4;
-  }
+  :root { --noir: #0e0e0e; --blanc: #f5f3ee; --or: #c9a84c; --or-light: #e8d5a3; --gris: #6b6b6b; --gris-light: #e8e6e1; --border: #ddd9d0; --surface: #faf8f4; }
   body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--noir); min-height: 100vh; font-size: 14px; }
   .header { background: var(--noir); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; }
   .logo { font-family: 'DM Serif Display', serif; color: var(--or); font-size: 20px; }
@@ -35,7 +32,7 @@
   .badge-hors { background: #fdecea; color: #c0392b; }
   .badge-autre { background: #f5f0e8; color: #8b6914; }
   .main { display: flex; flex-direction: column; overflow: hidden; }
-  .toolbar { padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; background: var(--blanc); }
+  .toolbar { padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; background: var(--blanc); flex-wrap: wrap; }
   .toolbar-btn { padding: 7px 14px; border: 1px solid var(--border); background: white; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; color: var(--noir); transition: all 0.15s; }
   .toolbar-btn:hover { background: var(--gris-light); }
   .toolbar-btn.primary { background: var(--or); color: var(--noir); border-color: var(--or); font-weight: 500; }
@@ -49,7 +46,6 @@
   .ai-section { border-top: 1px solid var(--border); background: var(--blanc); padding: 20px 32px; max-height: 45vh; overflow-y: auto; }
   .ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
   .ai-badge { font-size: 10px; background: var(--noir); color: var(--or); padding: 3px 8px; border-radius: 4px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
-  .ai-label { font-size: 12px; color: var(--gris); }
   .classification-box { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
   .class-pill { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; }
   .response-area { width: 100%; min-height: 140px; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.7; color: var(--noir); background: white; resize: vertical; outline: none; }
@@ -61,8 +57,9 @@
   @keyframes dot { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
   .empty-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gris); gap: 10px; }
   .empty-icon { font-size: 36px; opacity: 0.3; }
+  .debug-box { background: #1a1a1a; color: #0f0; font-family: monospace; font-size: 11px; padding: 12px; border-radius: 6px; margin-top: 10px; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; }
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; }
-  .modal { background: var(--blanc); border-radius: 12px; padding: 28px 32px; width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal { background: var(--blanc); border-radius: 12px; padding: 28px 32px; width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
   .modal h3 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 6px; }
   .modal p { font-size: 12px; color: var(--gris); margin-bottom: 16px; line-height: 1.6; }
   .modal input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; margin-bottom: 12px; background: white; }
@@ -109,7 +106,7 @@
 <div class="modal-overlay" id="apiModal" style="display:none">
   <div class="modal">
     <h3>Clé API OpenRouter</h3>
-    <p>Entrez votre clé API OpenRouter pour activer l'agent IA. Elle est stockée uniquement dans votre navigateur.<br><br>Obtenez-la sur <strong>openrouter.ai/keys</strong></p>
+    <p>Entrez votre clé API OpenRouter pour activer l'agent IA.<br>Elle est stockée uniquement dans votre navigateur.<br><br>Obtenez-la sur <strong>openrouter.ai/keys</strong></p>
     <input type="password" id="apiKeyInput" placeholder="sk-or-..." />
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeApiModal()">Annuler</button>
@@ -156,61 +153,38 @@ const TEMPLATES = {
   prospect_interesse: {
     from: "Marie Leblanc <marie@salon-eclat.fr>",
     subject: "Re : Développer vos avis Google",
-    body: `Bonjour,\n\nMerci pour votre message. J'ai bien reçu votre proposition concernant les avis Google et je dois avouer que ça m'intéresse vraiment.\n\nMon salon est ouvert depuis 3 ans et j'ai seulement 12 avis sur Google. Mes concurrentes en ont beaucoup plus et je pense que ça me fait perdre des clientes.\n\nPouvez-vous m'expliquer comment ça fonctionne concrètement ? Et quel est votre tarif ?\n\nCordialement,\nMarie Leblanc\nSalon Éclat`
+    body: "Bonjour,\n\nMerci pour votre message. J'ai bien reçu votre proposition concernant les avis Google et je dois avouer que ça m'intéresse vraiment.\n\nMon salon est ouvert depuis 3 ans et j'ai seulement 12 avis sur Google. Mes concurrentes en ont beaucoup plus et je pense que ça me fait perdre des clientes.\n\nPouvez-vous m'expliquer comment ça fonctionne concrètement ? Et quel est votre tarif ?\n\nCordialement,\nMarie Leblanc\nSalon Éclat"
   },
   prospect_objection_prix: {
     from: "Thomas Garnier <thomas@garage-garnier.fr>",
     subject: "Re : Votre offre avis Google",
-    body: `Bonjour,\n\nJ'ai bien lu votre email. Le concept est intéressant mais honnêtement 150€ par mois c'est beaucoup pour moi.\n\nEst-ce que vous avez quelque chose de moins cher ? Ou une formule à l'essai ?\n\nMerci,\nThomas`
+    body: "Bonjour,\n\nJ'ai bien lu votre email. Le concept est intéressant mais honnêtement 150 euros par mois c'est beaucoup pour moi.\n\nEst-ce que vous avez quelque chose de moins cher ? Ou une formule à l'essai ?\n\nMerci,\nThomas"
   },
   prospect_froid: {
     from: "Nadia Rousseau <nadia@boulangerie-rousseau.fr>",
     subject: "Re : Boostez votre réputation en ligne",
-    body: `Bonjour,\n\nJe ne suis pas intéressée pour le moment. Merci quand même.\n\nNadia`
+    body: "Bonjour,\n\nJe ne suis pas intéressée pour le moment. Merci quand même.\n\nNadia"
   },
   client_question: {
     from: "Pierre Martin <pierre@lebistrot.fr>",
     subject: "Question sur les avis",
-    body: `Bonjour,\n\nJe suis client chez vous depuis 2 mois et je suis plutôt satisfait.\n\nJ'avais une question : est-ce que je peux voir les profils des personnes qui laissent les avis ? Et est-ce que les avis seront toujours là dans 1 an ?\n\nMerci,\nPierre Martin`
+    body: "Bonjour,\n\nJe suis client chez vous depuis 2 mois et je suis plutôt satisfait.\n\nJ'avais une question : est-ce que les avis seront toujours là dans 1 an ?\n\nMerci,\nPierre Martin"
   },
   hors_sujet: {
     from: "newsletter@promo-web.fr",
     subject: "Offre spéciale création de site -50%",
-    body: `Bonjour,\n\nProfitez de notre offre exceptionnelle ! Création de site internet professionnel à partir de 299€.\n\nContactez-nous vite, offre limitée !\n\nL'équipe PromoWeb`
+    body: "Bonjour,\n\nProfitez de notre offre exceptionnelle ! Création de site internet à partir de 299 euros.\n\nContactez-nous vite !\n\nL'équipe PromoWeb"
   }
 };
 
-const SYSTEM_PROMPT = `Tu es l'agent email professionnel de l'entreprise Avis.one, un service qui fournit des avis Google authentiques à des professionnels.
+const SYSTEM_PROMPT = `Tu es l'agent email de Avis.one. Service : 10 avis Google par mois. Tarifs : 1er mois gratuit contre témoignage, 5 premiers clients 75 euros/mois à vie, autres : 75 euros le 2e mois puis 150 euros/mois. Ton : formel, vouvoiement. Signer : Cordialement, L'équipe Avis.one, avis.one.star@gmail.com.
 
-INFORMATIONS SUR L'ENTREPRISE :
-- Nom : Avis.one
-- Email professionnel : avis.one.star@gmail.com
-- Service : 10 avis Google par mois par client
-- Tarification :
-  * 1er mois : GRATUIT en échange d'un témoignage écrit + une recommandation
-  * 5 premiers clients : 75€/mois à vie (tarif préférentiel permanent)
-  * Autres clients : 75€ le 2e mois, puis 150€/mois à partir du 3e mois
-- Ton : toujours très formel, vouvoiement obligatoire, professionnel et rassurant
-- Cible : tout type de commerce
+Réponds UNIQUEMENT avec un objet JSON valide sur une seule ligne, sans markdown, sans explication, sans backticks. Format exact :
+{"classification":"PROSPECT_INTERESSE","raison":"...","action":"REPONDRE","reponse":"..."}
 
-TA MISSION :
-1. Classifier l'email parmi : PROSPECT_INTERESSE / PROSPECT_OBJECTION / PROSPECT_FROID / CLIENT / HORS_SUJET
-2. Rédiger une réponse email personnalisée adaptée au contexte
-3. Pour les HORS_SUJET, recommander l'archivage sans rédiger de réponse
-
-RÈGLES :
-- Toujours vouvoyer, ton chaleureux mais professionnel
-- Pour objections prix : rappeler la valeur et mentionner le 1er mois gratuit
-- Pour prospects intéressés : expliquer simplement et inviter à échanger
-- Signer : "Cordialement,\nL'équipe Avis.one\navis.one.star@gmail.com"
-
-RÉPONDRE UNIQUEMENT EN JSON VALIDE, sans markdown, sans backticks :
-{
-  "classification": "PROSPECT_INTERESSE|PROSPECT_OBJECTION|PROSPECT_FROID|CLIENT|HORS_SUJET",
-  "raison": "courte explication",
-  "action": "REPONDRE|ARCHIVER",
-  "reponse": "texte complet de la réponse email (vide si ARCHIVER)"
-}`;
+Valeurs possibles pour classification : PROSPECT_INTERESSE, PROSPECT_OBJECTION, PROSPECT_FROID, CLIENT, HORS_SUJET
+Valeurs possibles pour action : REPONDRE, ARCHIVER
+Si ARCHIVER, mettre reponse à vide.`;
 
 let emails = [];
 let selectedId = null;
@@ -219,19 +193,18 @@ let apiKey = localStorage.getItem('avis_one_api_key') || '';
 function renderEmailList() {
   const list = document.getElementById('emailList');
   if (emails.length === 0) {
-    list.innerHTML = `<div style="padding:20px;text-align:center;color:#aaa;font-size:12px">Aucun email.<br>Simulez-en un pour tester.</div>`;
+    list.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;font-size:12px">Aucun email.<br>Simulez-en un pour tester.</div>';
     return;
   }
-  list.innerHTML = emails.map(e => `
-    <div class="email-item ${e.id === selectedId ? 'active' : ''}" onclick="selectEmail(${e.id})">
-      <div class="email-sender">
-        ${e.from.split('<')[0].trim()}
-        ${e.classification ? `<span class="badge badge-${getBadgeClass(e.classification)}">${getShortClass(e.classification)}</span>` : ''}
-      </div>
-      <div class="email-subject">${e.subject}</div>
-      <div class="email-preview">${e.body.substring(0,60)}...</div>
-    </div>
-  `).join('');
+  list.innerHTML = emails.map(e =>
+    '<div class="email-item ' + (e.id === selectedId ? 'active' : '') + '" onclick="selectEmail(' + e.id + ')">' +
+    '<div class="email-sender">' + e.from.split('<')[0].trim() +
+    (e.classification ? '<span class="badge badge-' + getBadgeClass(e.classification) + '">' + getShortClass(e.classification) + '</span>' : '') +
+    '</div>' +
+    '<div class="email-subject">' + e.subject + '</div>' +
+    '<div class="email-preview">' + e.body.substring(0,60) + '...</div>' +
+    '</div>'
+  ).join('');
 }
 
 function getBadgeClass(c) {
@@ -240,95 +213,101 @@ function getBadgeClass(c) {
   if (c === 'HORS_SUJET') return 'hors';
   return 'autre';
 }
+
 function getShortClass(c) {
-  const map = {'PROSPECT_INTERESSE':'Prospect','PROSPECT_OBJECTION':'Objection','PROSPECT_FROID':'Froid','CLIENT':'Client','HORS_SUJET':'Hors-sujet'};
+  var map = {'PROSPECT_INTERESSE':'Prospect','PROSPECT_OBJECTION':'Objection','PROSPECT_FROID':'Froid','CLIENT':'Client','HORS_SUJET':'Hors-sujet'};
   return map[c] || c;
 }
 
 function selectEmail(id) {
   selectedId = id;
-  const email = emails.find(e => e.id === id);
+  var email = emails.find(function(e){ return e.id === id; });
   email.read = true;
   renderEmailList();
   renderMain();
 }
 
 function renderMain() {
-  const email = emails.find(e => e.id === selectedId);
+  var email = emails.find(function(e){ return e.id === selectedId; });
   if (!email) return;
-  document.getElementById('mainArea').innerHTML = `
-    <div class="toolbar">
-      <button class="toolbar-btn primary" onclick="generateResponse()" id="genBtn">✦ Générer une réponse IA</button>
-      <button class="toolbar-btn" onclick="archiveEmail()">Archiver</button>
-      ${email.classification ? `<span style="font-size:11px;color:var(--gris);margin-left:8px">Classifié : <strong>${email.classification}</strong></span>` : ''}
-    </div>
-    <div class="email-view">
-      <div class="email-meta">
-        <h2>${email.subject}</h2>
-        <div class="meta-row">
-          <span><strong>De :</strong> ${email.from}</span>
-          <span><strong>À :</strong> avis.one.star@gmail.com</span>
-          <span style="color:#aaa">${email.date}</span>
-        </div>
-      </div>
-      <div class="email-body">${email.body}</div>
-    </div>
-    ${email.aiResponse !== undefined ? renderAISection(email) : ''}
-  `;
+  var html = '<div class="toolbar">' +
+    '<button class="toolbar-btn primary" onclick="generateResponse()" id="genBtn">Générer une réponse IA</button>' +
+    '<button class="toolbar-btn" onclick="archiveEmail()">Archiver</button>' +
+    (email.classification ? '<span style="font-size:11px;color:var(--gris)">Classifié : <strong>' + email.classification + '</strong></span>' : '') +
+    '</div>' +
+    '<div class="email-view">' +
+    '<div class="email-meta"><h2>' + email.subject + '</h2>' +
+    '<div class="meta-row"><span><strong>De :</strong> ' + email.from + '</span><span style="color:#aaa">' + email.date + '</span></div></div>' +
+    '<div class="email-body">' + email.body + '</div>' +
+    '</div>';
+  if (email.aiResponse !== undefined) {
+    html += renderAISection(email);
+  }
+  document.getElementById('mainArea').innerHTML = html;
 }
 
 function renderAISection(email) {
-  return `
-    <div class="ai-section">
-      <div class="ai-header">
-        <span class="ai-badge">Agent IA</span>
-        <span class="ai-label">Analyse et réponse générée</span>
-      </div>
-      <div class="classification-box">
-        <span class="class-pill" style="background:#f0ebe0;color:#5a4a1a">Classification : ${email.classification}</span>
-        <span class="class-pill" style="background:#e8f0e8;color:#2d4a2d">Action : ${email.action}</span>
-        ${email.aiReason ? `<span class="class-pill" style="background:#f5f5f5;color:#666">${email.aiReason}</span>` : ''}
-      </div>
-      ${email.action === 'REPONDRE' ? `
-        <div style="font-size:11px;color:var(--gris);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px">Réponse proposée (modifiable)</div>
-        <textarea class="response-area" id="responseTextarea">${email.aiResponse}</textarea>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="toolbar-btn primary" onclick="copyResponse()" style="font-size:12px">Copier la réponse</button>
-          <button class="toolbar-btn" onclick="regenerate()" style="font-size:12px">↺ Régénérer</button>
-        </div>
-      ` : `<div style="font-size:13px;color:#c0392b;padding:12px;background:#fdecea;border-radius:6px;border-left:3px solid #c0392b">Email hors-sujet détecté — archivage recommandé.</div>`}
-    </div>
-  `;
+  var html = '<div class="ai-section">' +
+    '<div class="ai-header"><span class="ai-badge">Agent IA</span></div>' +
+    '<div class="classification-box">' +
+    '<span class="class-pill" style="background:#f0ebe0;color:#5a4a1a">Classification : ' + email.classification + '</span>' +
+    '<span class="class-pill" style="background:#e8f0e8;color:#2d4a2d">Action : ' + email.action + '</span>' +
+    (email.aiReason ? '<span class="class-pill" style="background:#f5f5f5;color:#666">' + email.aiReason + '</span>' : '') +
+    '</div>';
+  if (email.action === 'REPONDRE') {
+    html += '<div style="font-size:11px;color:var(--gris);text-transform:uppercase;margin-bottom:8px">Réponse proposée (modifiable)</div>' +
+      '<textarea class="response-area" id="responseTextarea">' + email.aiResponse + '</textarea>' +
+      '<div style="display:flex;gap:8px;margin-top:10px">' +
+      '<button class="toolbar-btn primary" onclick="copyResponse()" style="font-size:12px">Copier la réponse</button>' +
+      '<button class="toolbar-btn" onclick="regenerate()" style="font-size:12px">Régénérer</button>' +
+      '</div>';
+  } else {
+    html += '<div style="font-size:13px;color:#c0392b;padding:12px;background:#fdecea;border-radius:6px">Email hors-sujet — archivage recommandé.</div>';
+  }
+  html += '</div>';
+  return html;
 }
 
 async function generateResponse() {
   if (!apiKey) { showApiModal(); return; }
-  const email = emails.find(e => e.id === selectedId);
+  var email = emails.find(function(e){ return e.id === selectedId; });
   if (!email) return;
-  const btn = document.getElementById('genBtn');
+  var btn = document.getElementById('genBtn');
   btn.disabled = true;
-  btn.innerHTML = `<span class="loading-dots"><span></span><span></span><span></span></span> Analyse en cours...`;
+  btn.innerHTML = 'Analyse en cours...';
   try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    var res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': 'Bearer ' + apiKey,
         'HTTP-Referer': 'https://avis-one-agent.vercel.app',
-        'X-Title': 'Avis.one Agent Gmail'
+        'X-Title': 'Avis.one'
       },
       body: JSON.stringify({
         model: 'meta-llama/llama-3.3-70b-instruct:free',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: `Email reçu de : ${email.from}\nObjet : ${email.subject}\n\nContenu :\n${email.body}` }
+          { role: 'user', content: 'Email de : ' + email.from + '\nObjet : ' + email.subject + '\n\n' + email.body }
         ]
       })
     });
-    const data = await res.json();
-    const text = data.choices?.[0]?.message?.content || '';
-    const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    var data = await res.json();
+    if (data.error) {
+      throw new Error('API Error: ' + JSON.stringify(data.error));
+    }
+    var text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if (!text) {
+      throw new Error('Réponse vide. Données reçues : ' + JSON.stringify(data));
+    }
+    var clean = text.replace(/```json/g,'').replace(/```/g,'').trim();
+    var jsonStart = clean.indexOf('{');
+    var jsonEnd = clean.lastIndexOf('}');
+    if (jsonStart === -1 || jsonEnd === -1) {
+      throw new Error('JSON introuvable dans : ' + clean);
+    }
+    clean = clean.substring(jsonStart, jsonEnd + 1);
+    var parsed = JSON.parse(clean);
     email.classification = parsed.classification;
     email.aiReason = parsed.raison;
     email.action = parsed.action;
@@ -337,13 +316,13 @@ async function generateResponse() {
     renderMain();
   } catch(err) {
     btn.disabled = false;
-    btn.innerHTML = '✦ Générer une réponse IA';
-    alert('Erreur : ' + err.message + '\nVérifiez votre clé API sur openrouter.ai/keys');
+    btn.innerHTML = 'Générer une réponse IA';
+    alert('Erreur détaillée :\n' + err.message);
   }
 }
 
 function regenerate() {
-  const email = emails.find(e => e.id === selectedId);
+  var email = emails.find(function(e){ return e.id === selectedId; });
   if (!email) return;
   email.aiResponse = undefined;
   email.classification = null;
@@ -352,15 +331,15 @@ function regenerate() {
 }
 
 function copyResponse() {
-  const ta = document.getElementById('responseTextarea');
-  if (ta) { navigator.clipboard.writeText(ta.value); ta.style.borderColor = '#2d6a4f'; setTimeout(()=>ta.style.borderColor='', 1500); }
+  var ta = document.getElementById('responseTextarea');
+  if (ta) { navigator.clipboard.writeText(ta.value); ta.style.borderColor = '#2d6a4f'; setTimeout(function(){ ta.style.borderColor=''; }, 1500); }
 }
 
 function archiveEmail() {
-  emails = emails.filter(e => e.id !== selectedId);
+  emails = emails.filter(function(e){ return e.id !== selectedId; });
   selectedId = null;
   renderEmailList();
-  document.getElementById('mainArea').innerHTML = `<div class="empty-state"><div class="empty-icon">✓</div><div class="empty-text">Email archivé</div></div>`;
+  document.getElementById('mainArea').innerHTML = '<div class="empty-state"><div class="empty-icon">OK</div><div class="empty-text">Email archivé</div></div>';
 }
 
 function showApiModal() {
@@ -373,34 +352,33 @@ function saveApiKey() {
   localStorage.setItem('avis_one_api_key', apiKey);
   closeApiModal();
 }
-
 function showCompose() { document.getElementById('composePanel').style.display = 'flex'; }
 function closeCompose() { document.getElementById('composePanel').style.display = 'none'; }
 
 function fillTemplate() {
-  const type = document.getElementById('cType').value;
+  var type = document.getElementById('cType').value;
   if (!type || !TEMPLATES[type]) return;
-  const t = TEMPLATES[type];
+  var t = TEMPLATES[type];
   document.getElementById('cFrom').value = t.from;
   document.getElementById('cSubject').value = t.subject;
   document.getElementById('cBody').value = t.body;
 }
 
 function addEmail() {
-  const from = document.getElementById('cFrom').value.trim();
-  const subject = document.getElementById('cSubject').value.trim();
-  const body = document.getElementById('cBody').value.trim();
+  var from = document.getElementById('cFrom').value.trim();
+  var subject = document.getElementById('cSubject').value.trim();
+  var body = document.getElementById('cBody').value.trim();
   if (!from || !subject || !body) { alert('Remplissez tous les champs.'); return; }
-  const now = new Date();
+  var now = new Date();
   emails.unshift({
-    id: Date.now(), from, subject, body,
+    id: Date.now(), from: from, subject: subject, body: body,
     date: now.toLocaleDateString('fr-FR', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}),
     read: false, classification: null, aiResponse: undefined, action: null, aiReason: null
   });
   closeCompose();
   renderEmailList();
   selectEmail(emails[0].id);
-  ['cFrom','cSubject','cBody'].forEach(id => document.getElementById(id).value = '');
+  ['cFrom','cSubject','cBody'].forEach(function(id){ document.getElementById(id).value = ''; });
   document.getElementById('cType').value = '';
 }
 
